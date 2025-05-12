@@ -1,0 +1,116 @@
+-- USER TABLE
+CREATE TABLE User (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255),
+    role ENUM('student', 'staff', 'admin') NOT NULL
+);
+
+-- STUDENT TABLE
+CREATE TABLE Student (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    student_id_card VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
+);
+
+-- STAFF TABLE
+CREATE TABLE Staff (
+    staff_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    staff_id_card VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
+);
+
+-- MEMBERSHIP TABLE
+CREATE TABLE Membership (
+    membership_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    approved_by INT,
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (approved_by) REFERENCES Staff(staff_id)
+);
+
+-- QRCode TABLE
+CREATE TABLE QRCode (
+    qrcode_id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(100),
+    code_status ENUM('active', 'inactive'),
+    qr_image TEXT
+);
+
+-- EVENT TABLE
+CREATE TABLE Event (
+    event_id INT PRIMARY KEY AUTO_INCREMENT,
+    qrcode_id INT,
+    title VARCHAR(255),
+    description TEXT,
+    location VARCHAR(255),
+    start_date_event DATE,
+    event_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    approval_letter TEXT,
+    FOREIGN KEY (qrcode_id) REFERENCES QRCode(qrcode_id)
+);
+
+-- COMMITTEE_ROLE TABLE
+CREATE TABLE Comitee_Role (
+    cr_id INT PRIMARY KEY AUTO_INCREMENT,
+    cr_desc VARCHAR(255)
+);
+
+-- EVENT_COMMITTEE TABLE
+CREATE TABLE EventCommittee (
+    committee_id INT PRIMARY KEY AUTO_INCREMENT,
+    event_id INT,
+    user_id INT,
+    cr_id INT,
+    FOREIGN KEY (event_id) REFERENCES Event(event_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (cr_id) REFERENCES Comitee_Role(cr_id)
+);
+
+-- MERIT TABLE
+CREATE TABLE Merit (
+    Merit_id INT PRIMARY KEY AUTO_INCREMENT,
+    event_id INT,
+    event_level VARCHAR(100),
+    points_main_committee INT,
+    points_committee INT,
+    points_participant INT,
+    FOREIGN KEY (event_id) REFERENCES Event(event_id)
+);
+
+-- STUDENT_MERIT TABLE
+CREATE TABLE Student_Merit (
+    student_merit_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT,
+    Merit_id INT,
+    role VARCHAR(100),
+    points_awarded INT,
+    FOREIGN KEY (student_id) REFERENCES Student(student_id),
+    FOREIGN KEY (Merit_id) REFERENCES Merit(Merit_id)
+);
+
+-- ATTENDANCE TABLE
+CREATE TABLE Attendance (
+    attendance_id INT PRIMARY KEY AUTO_INCREMENT,
+    event_id INT,
+    check_in_time DATETIME,
+    location VARCHAR(255),
+    attendance_status ENUM('present', 'absent'),
+    FOREIGN KEY (event_id) REFERENCES Event(event_id)
+);
+
+-- ATTENDANCE_SLOT TABLE
+CREATE TABLE Attendance_Slot (
+    attendance_slot_id INT PRIMARY KEY AUTO_INCREMENT,
+    attendance_id INT,
+    user_id INT,
+    qrcode_id INT,
+    status ENUM('valid', 'invalid'),
+    FOREIGN KEY (attendance_id) REFERENCES Attendance(attendance_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (qrcode_id) REFERENCES QRCode(qrcode_id)
+);
