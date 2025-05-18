@@ -2,7 +2,7 @@
 session_start();  // Ensure the session is started
 
 $serverName = "localhost";
-$userName = "root"; // default XAMPP MySQL userName
+$userName = "root"; // default 
 $password = ""; // default XAMPP MySQL password
 $dbName = "mypetakom"; // the database we created earlier
 
